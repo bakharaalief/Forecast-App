@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.sothree.slidinguppanel.SlidingUpPanelLayout
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sliding_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    style="@style/smoothSlide"
+    sothree:umanoOverlay="true"
+    sothree:umanoPanelHeight="50dp"
+    sothree:umanoShadowHeight="4dp">
+
+    <LinearLayout
+        android:id="@+id/wallpaper_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gambar_hujan"
+        android:orientation="vertical"
+        >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/weather_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="4"
+                android:visibility="visible"
+                android:background="@color/blackTransparant"
+                android:orientation="vertical">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.4"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/get_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_baseline_my_location"
+                        android:layout_marginRight="25dp"/>
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.8"/>
+
+                <ImageView
+                    android:id="@+id/weather_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_rain"
+                    android:layout_marginBottom="5dp"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:id="@+id/weather_description"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:text="Rainy"/>
+
+                <TextView
+                    android:id="@+id/city_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Jakarta"
+                    android:textSize="50dp"
+                    android:textColor="@android:color/white"/>
+
+                <TextView
+                    android:id="@+id/country_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:textSize="20dp"
+                    android:visibility="gone"
+                    android:textColor="@android:color/white"
+                    android:text=",ID"/>
+
+                <TextView
+                    android:id="@+id/temp_weather"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="72⁰C"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1.5"/>
+
+                <TextView
+                    android:id="@+id/poem"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:maxWidth="300dp"
+                    android:textSize="15dp"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:text="Tetap semangat walau derasnya hujan datang menerpa"/>
+
+                <TextView
+                    android:id="@+id/poem_author"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="15dp"
+                    android:text="- Wadaw -"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/weather_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:gravity="center"
+                android:background="@color/blackTransparant">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="40dp"
+                    android:text="Loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/weather_error"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:gravity="center"
+                android:background="@color/blackTransparant">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="40dp"
+                    android:text="error" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:background="@drawable/slide_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            layout="@layout/weather_detail" />
+
+    </LinearLayout>
+
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>
