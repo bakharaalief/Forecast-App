@@ -9,7 +9,7 @@ interface WeatherService {
 
     @GET("weather?")
     fun getCurrentWeatherData(
-        @Query("q") cityName: String,
-        @Query("units") units: String,
+        @Query("lon") lon: String,
+        @Query("lat") lat: String,
         @Query("appid") app_id: String):Call<WeatherResponse>
 }

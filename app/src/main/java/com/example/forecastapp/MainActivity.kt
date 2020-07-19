@@ -1,5 +1,6 @@
 package com.example.forecastapp
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import com.example.forecastapp.api.WeatherResponse
 import com.example.forecastapp.api.WeatherService
+import com.google.android.gms.location.LocationServices
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.weather_detail.*
@@ -26,10 +28,13 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    val location = "Jakarta"
-    val units = "metric"
+    var lon = "106.85" //default location
+    var lat = "-6.21"
     val appid = "b075fc1f8e35b9bf314107ce9fae987e"
 
+    var sudah : Boolean = false
+
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -46,16 +51,28 @@ class MainActivity : AppCompatActivity() {
             window.statusBarColor = Color.TRANSPARENT
         }
 
-        //configuration for slider
-        sliding_layout.addPanelSlideListener(slideListener())
+        //get location
+        currentLocation()
 
         //call api
         currentData()
 
-        get_location.setOnClickListener {
-            Toast.makeText(this, "get location", Toast.LENGTH_SHORT).show()
+        //refresh
+        refresh_layout.setOnRefreshListener {
+            Toast.makeText(this, "Refresh Data", Toast.LENGTH_SHORT).show()
+            currentData()
+            refresh_layout.isRefreshing = false
         }
 
+        //configuration for slider
+        sliding_layout.addPanelSlideListener(slideListener())
+
+        //get location with click
+        get_location.setOnClickListener {
+            Toast.makeText(this, "get location", Toast.LENGTH_SHORT).show()
+            currentLocation()
+            currentData()
+        }
     }
 
     //make taskbar transparent
@@ -72,7 +89,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun slideListener() : SlidingUpPanelLayout.PanelSlideListener {
         return object : SlidingUpPanelLayout.PanelSlideListener{
-            var sudah : Boolean = false
 
             override fun onPanelSlide(panel: View?, slideOffset: Float) {
             }
@@ -160,8 +176,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //api call
     private fun currentData(){
+
+        //loading
+        weather_content.visibility = View.GONE
+        weather_loading.visibility = View.VISIBLE
+        weather_error.visibility = View.GONE
+        city_location_detail.setText("loading")
+        time_detail.setText("loading")
 
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/data/2.5/")
@@ -169,7 +191,7 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val service = retrofit.create(WeatherService::class.java)
-        val call = service.getCurrentWeatherData(location, units, appid)
+        val call = service.getCurrentWeatherData(lon, lat, appid)
         call.enqueue(object : Callback<WeatherResponse> {
 
             override fun onResponse(
@@ -198,11 +220,13 @@ class MainActivity : AppCompatActivity() {
                     val minTemp = weatherResponse.main.tempMin
                     val allClouds = weatherResponse.clouds!!.all
 
+                    sudah = false
+
                     //weather
-                    getIconBackgroundWeather(iconWeather.toString())
+                    getIconBackgroundWeather(weather!!)
                     weather_description.setText(weather)
                     city_location.setText(city)
-                    temp_weather.setText("${temp!!.toInt()} ⁰C")
+                    temp_weather.setText("${getCelcius(temp!!)} ⁰C")
                     city_location_detail.setText("${city}, ${country}")
                     time_detail.setText(getTime(Date()))
                     sunrise_time_detail.setText(getTime(Date(sunriseTime!!.toLong()*1000)))
@@ -210,21 +234,33 @@ class MainActivity : AppCompatActivity() {
                     pressure_detail.setText("${pressure} hpa")
                     wind_detail.setText("${windSpeed} m/s")
                     humidity_detail.setText("${humidity} %")
-                    max_temp_detail.setText("${maxTemp} ⁰C")
-                    min_temp_detail.setText("${minTemp} ⁰C")
+                    max_temp_detail.setText("${getCelcius(temp!!)} ⁰C")
+                    min_temp_detail.setText("${getCelcius(temp!!)} ⁰C")
                     clouds_detail.setText(allClouds.toString())
                 }
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-                Log.i("wadaw", "${t}")
 
                 weather_content.visibility = View.GONE
                 weather_loading.visibility = View.GONE
                 weather_error.visibility = View.VISIBLE
+
             }
 
         })
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun currentLocation(){
+        val mFusedLocation = LocationServices.getFusedLocationProviderClient(this)
+        mFusedLocation.lastLocation.addOnSuccessListener { location ->
+            val latInput = location.latitude
+            val lonInput = location.longitude
+
+            lat = latInput.toString()
+            lon = lonInput.toString()
+        }
     }
 
     private fun getTime(time: Date) : String {
@@ -233,8 +269,9 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    private fun getIconBackgroundWeather(icon : String){
-        when(icon){
+    private fun getIconBackgroundWeather(weather : String){
+        Log.i("wadaw", "${weather}")
+        when(weather){
             "Rain" -> {
                 weather_icon.setImageResource(R.drawable.ic_rain)
                 wallpaper_background.setBackgroundResource(R.drawable.gambar_hujan)
@@ -247,11 +284,21 @@ class MainActivity : AppCompatActivity() {
                 weather_icon.setImageResource(R.drawable.ic_thunderstorm)
                 wallpaper_background.setBackgroundResource(R.drawable.gambar_hujan)
             }
+            "Haze"->{
+                weather_icon.setImageResource(R.drawable.ic_haze)
+                wallpaper_background.setBackgroundResource(R.drawable.gambar_haze)
+            }
             else ->{
                 weather_icon.setImageResource(R.drawable.ic_planet)
                 wallpaper_background.setBackgroundResource(R.drawable.gambar_lain)
             }
         }
+    }
+    
+    private fun getCelcius(kelvin : Double) : Int{
+        val celcius = kelvin - 273.15
+        val result = celcius.toInt()
+        return result
     }
 }
 
