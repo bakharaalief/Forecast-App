@@ -173,7 +173,7 @@
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>
-    
+
     <LinearLayout
         android:background="@drawable/slide_background"
         android:layout_width="match_parent"

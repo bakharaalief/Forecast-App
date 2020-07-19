@@ -234,8 +234,8 @@ class MainActivity : AppCompatActivity() {
                     pressure_detail.setText("${pressure} hpa")
                     wind_detail.setText("${windSpeed} m/s")
                     humidity_detail.setText("${humidity} %")
-                    max_temp_detail.setText("${getCelcius(temp!!)} ⁰C")
-                    min_temp_detail.setText("${getCelcius(temp!!)} ⁰C")
+                    max_temp_detail.setText("${getCelcius(maxTemp!!)} ⁰C")
+                    min_temp_detail.setText("${getCelcius(minTemp!!)} ⁰C")
                     clouds_detail.setText(allClouds.toString())
                 }
             }
