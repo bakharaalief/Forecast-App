@@ -17,6 +17,8 @@ import com.example.forecastapp.Room.Repository.LocationRepository
 import com.example.forecastapp.Room.RoomDB
 import com.example.forecastapp.api.WeatherResponse
 import com.example.forecastapp.api.WeatherService
+import com.example.forecastapp.quotes.ListQuotes
+import com.example.forecastapp.quotes.QuotesData
 import com.google.android.gms.location.LocationServices
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_main.*
@@ -68,22 +70,21 @@ class MainActivity : AppCompatActivity() {
         repository = LocationRepository(locationDao)
         listLocation = repository.allLocation
 
-        //location
+        //get location from saved db
         if(listLocation.size > 0){
             lon = listLocation.get(0).lon
             lat = listLocation.get(0).lat
         }
 
-        //get location
-        currentLocation()
-
         //call api
         currentData()
+        changeQuotes()
 
         //refresh
         refresh_layout.setOnRefreshListener {
             Toast.makeText(this, "Refresh Data", Toast.LENGTH_SHORT).show()
             currentData()
+            changeQuotes()
             refresh_layout.isRefreshing = false
         }
 
@@ -95,6 +96,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "get location", Toast.LENGTH_SHORT).show()
             currentLocation()
             currentData()
+            changeQuotes()
 
             if(listLocation.size == 0){
                 inserData(lon, lat)
@@ -197,8 +199,6 @@ class MainActivity : AppCompatActivity() {
 
                     sudah = true
                 }
-
-
 
             }
 
@@ -344,6 +344,20 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.IO) {
             repository.updateLocation(data)
         }
+    }
+
+    private fun changeQuotes(){
+        val listText = ListQuotes().listQuotes
+        val randomIndex = Random().nextInt(listText.size)
+        val text = listText.get(randomIndex).quote
+        val author = listText.get(randomIndex).author
+
+        quotes.setText(text)
+        quotes_author.setText(author)
+
+        val animation = AnimationUtils.loadAnimation(this, R.anim.vertical_fade_in)
+        quotes.startAnimation(animation)
+        quotes_author.startAnimation(animation)
     }
 
 }

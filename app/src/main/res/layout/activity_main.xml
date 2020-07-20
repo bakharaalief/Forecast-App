@@ -112,7 +112,7 @@
                         android:layout_weight="2"/>
 
                     <TextView
-                        android:id="@+id/poem"
+                        android:id="@+id/quotes"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -124,13 +124,14 @@
                         android:text="Tetap semangat walau derasnya hujan datang menerpa"/>
 
                     <TextView
-                        android:id="@+id/poem_author"
-                        android:layout_gravity="center"
+                        android:id="@+id/quotes_author"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="Wadaw"
                         android:textColor="@android:color/white"
-                        android:textSize="15dp"
-                        android:text="- Wadaw -"/>
+                        android:textSize="16dp" />
 
                 </LinearLayout>
 
