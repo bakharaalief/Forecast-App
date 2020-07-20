@@ -5,11 +5,16 @@ import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import com.example.forecastapp.Room.Dao.LocationDao
+import com.example.forecastapp.Room.Entity.CurrentLocation
+import com.example.forecastapp.Room.Repository.LocationRepository
+import com.example.forecastapp.Room.RoomDB
 import com.example.forecastapp.api.WeatherResponse
 import com.example.forecastapp.api.WeatherService
 import com.google.android.gms.location.LocationServices
@@ -17,6 +22,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.weather_detail.*
 import kotlinx.android.synthetic.main.weather_detail.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,8 +39,11 @@ class MainActivity : AppCompatActivity() {
     var lon = "106.85" //default location
     var lat = "-6.21"
     val appid = "b075fc1f8e35b9bf314107ce9fae987e"
-
     var sudah : Boolean = false
+
+    private lateinit var repository : LocationRepository
+    private lateinit var listLocation : List<CurrentLocation>
+    var db : RoomDB? = null
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +60,18 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= 21) {
             setWindowFlag(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false)
             window.statusBarColor = Color.TRANSPARENT
+        }
+
+        //database
+        db = RoomDB.getDB(this)
+        val locationDao = db!!.locationDao()
+        repository = LocationRepository(locationDao)
+        listLocation = repository.allLocation
+
+        //location
+        if(listLocation.size > 0){
+            lon = listLocation.get(0).lon
+            lat = listLocation.get(0).lat
         }
 
         //get location
@@ -72,6 +95,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "get location", Toast.LENGTH_SHORT).show()
             currentLocation()
             currentData()
+
+            if(listLocation.size == 0){
+                inserData(lon, lat)
+            }else{
+                updateData(lon, lat)
+            }
         }
     }
 
@@ -300,6 +329,23 @@ class MainActivity : AppCompatActivity() {
         val result = celcius.toInt()
         return result
     }
+
+    private fun inserData(lonInput : String, latInput : String){
+        val data = CurrentLocation(0, lonInput, latInput)
+
+        GlobalScope.launch(Dispatchers.IO) {
+            repository.insertLocation(data)
+        }
+    }
+
+    private fun updateData(lonInput : String, latInput : String){
+        val data = CurrentLocation(0, lonInput, latInput)
+
+        GlobalScope.launch(Dispatchers.IO) {
+            repository.updateLocation(data)
+        }
+    }
+
 }
 
 
